@@ -5,10 +5,35 @@ import { fatchData, exerciseOptions } from '../utils/fatchData';
 
 const SearchExercises = () => {
   const [search, setSearch] = useState('');
+  const [exercises, setExercises] = useState([]);
+  const [bodyParts, setBodyParts] = useState([]);
+
+  useEffect(() => {
+    const fetchExercisesData = async () => {
+      const bodyPartsData = await fatchData('https://exercisedb.p.rapidapi.com/exercises/bodyPartList',
+        exerciseOptions);
+
+      setBodyParts(['all', ...bodyPartsData]);
+    }
+
+    fetchExercisesData();
+  }, [])
 
   const handleSearch = async () => {
     if (search) {
-      const exercisesData = await fatchData('https:exercisedb.p.rapidapi.com/exercises/bodyPartList');
+      const exercisesData = await fatchData
+        ('https://exercisedb.p.rapidapi.com/exercises',
+          exerciseOptions);
+
+      const searchExercises = exercisesData.filter(
+        (exercise) => exercise.name.toLowerCase().includes(search)
+          || exercise.target.toLowerCase().includes(search)
+          || exercise.equipment.toLowerCase().includes(search)
+          || exercise.bodyPart.toLowerCase().includes(search)
+      );
+
+      setSearch("");
+      setExercises(searchExercises)
     }
   };
 
@@ -47,9 +72,14 @@ const SearchExercises = () => {
             width: { lg: '170px', xs: '80px' },
             fontSize: { lg: '20px', xs: '14px' },
             height: '56px', position: 'absolute', right: "0"
-          }} onClick={handleSearch}>
+          }}
+          onClick={handleSearch}>
           Search
         </Button>
+      </Box>
+
+      <Box sx={{ position: 'relative', width: '100%', p: '20px' }}>
+
       </Box>
     </Stack>
   )
